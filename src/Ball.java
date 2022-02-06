@@ -21,6 +21,8 @@ public class Ball extends JComponent {
     private int xVelocity;
     private int yVelocity;
     private int radius;
+    // TODO: implement better velocity system to allow finer speed differences
+    //       use doubles to hold xCoord and yCoord
 
     public Ball(int windowY, int windowX, int radius) {
         this.windowY = windowY;
@@ -74,7 +76,6 @@ public class Ball extends JComponent {
         yVelocity = (random.nextInt(3) + 1) * multiplier * negative;
     }
     
-    // This method paints the ball
     protected void paintComponent(Graphics g) {
         g.setColor(Color.gray);
         g.fillOval(0, 0, getSize().width - 1, getSize().height - 1);

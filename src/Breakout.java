@@ -2,8 +2,6 @@ import java.awt.AWTException;
 import java.awt.Cursor;
 import java.awt.MouseInfo;
 import java.awt.Robot;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.swing.JFrame;
 
 /**
@@ -19,7 +17,7 @@ public class Breakout {
     private final int HEIGHT;
     private JFrame window;
     private int lives = 3;
-    private final int DELAY = 5;
+    private Robot mouseControl;
 
     public Breakout(Ball ball, Level level, Paddle paddle,
             int width, int height, JFrame window) {
@@ -29,6 +27,13 @@ public class Breakout {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.window = window;
+        try {
+            mouseControl = new Robot();
+        } catch (AWTException e) {
+            System.err.println("Error initializing game");
+        }
+        level.addBricks(10, 10, HEIGHT, WIDTH, window);
+        window.repaint();
     }
 
     /**
@@ -39,14 +44,14 @@ public class Breakout {
      */
     public int checkBall() {
         // Check if ball has hit a side, top, or bottom
-        if (ball.getX() <= 0 || ball.getX() >= WIDTH - ball.getWidth()) { //Side
+        if (ball.getX() <= 0 || ball.getX() >= WIDTH - ball.getWidth()) { // Side
             ball.setxVelocity(-ball.getxVelocity());
             System.out.println("Ball hit side.");
         }
         if (ball.getY() <= HEIGHT / 15) { // Top
             ball.setyVelocity(-ball.getyVelocity());
             System.out.println("Ball hit top.");
-        } else if (ball.getY() >= HEIGHT) { //Bottom
+        } else if (ball.getY() >= HEIGHT) { // Bottom
             System.out.println("Ball hit bottom.");
             return -1;
         }
@@ -92,7 +97,7 @@ public class Breakout {
      * @return 0 if no bricks are hit or -1 if one is hit
      *
      */
-    public int checkBricks() {
+    public int checkBricks() { // TODO: add winning message if all bricks are destroyed
         // Get ball location
         int ballX = ball.getX();
         int ballY = ball.getY();
@@ -124,44 +129,17 @@ public class Breakout {
     }
 
     /**
-     * Runs the Breakout program.
-     */
-    public void run() {
-        lives = 3;
-
-        level.addBricks(10, 10, HEIGHT, WIDTH, window);
-        window.repaint();
-
-        Timer timer = new Timer();
-        TimerTask move = new TimerTask() {
-            @Override
-            public void run() {
-                if (loopGame() == 0) {
-                    timer.cancel();
-                }
-            }
-        };
-        timer.scheduleAtFixedRate(move, 0, DELAY);
-    }
-
-    /**
      * @return Returns 0 if game is over
      */
     public int loopGame() {
         // Get mouse x location
         int mouseX = MouseInfo.getPointerInfo().getLocation().x;
-        // Create robot to move cursor back to window
-        try {
-            Robot robot = new Robot();
-            // Move back cursor if it goes too far
-            if (mouseX < 0) {
-                robot.mouseMove(0, MouseInfo.getPointerInfo().getLocation().y);
-            } else if (mouseX > WIDTH) {
-                robot.mouseMove(WIDTH,
-                        MouseInfo.getPointerInfo().getLocation().y);
-            }
-        } catch (AWTException ex) {
-            System.err.println("Error creating robot.");
+        // Move back cursor if it goes too far
+        if (mouseX < 0) {
+            mouseControl.mouseMove(0, MouseInfo.getPointerInfo().getLocation().y);
+        } else if (mouseX > WIDTH) {
+            mouseControl.mouseMove(WIDTH,
+                    MouseInfo.getPointerInfo().getLocation().y);
         }
 
         movePaddle(mouseX);
@@ -170,9 +148,9 @@ public class Breakout {
         if (checkBall() == -1) {
             if (lives > 1) {
                 System.out.println("Lives: " + lives);
+                // TODO: add lives counter on screen
                 lives--;
                 ball.initBall();
-                //level.getBall().initBall();
             } else {
                 window.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 System.out.println("Out of lives: Game over!");
