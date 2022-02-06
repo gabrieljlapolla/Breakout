@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -11,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.event.MouseInputAdapter;
 
 /**
  *
@@ -44,7 +46,7 @@ public class BreakoutGUI extends JFrame {
     public void initialize() {
         GraphicsEnvironment graphics = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice device = graphics.getDefaultScreenDevice();
-        //device.setFullScreenWindow(this); // Set to full screen
+        // device.setFullScreenWindow(this); // Set to full screen
 
         // Monitor width and height
         width = device.getDisplayMode().getWidth();
@@ -53,10 +55,10 @@ public class BreakoutGUI extends JFrame {
         setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 
         // Set icon
-        ImageIcon icon = new ImageIcon("breakoutIcon.png");
+        ImageIcon icon = new ImageIcon("src/resources/breakoutIcon.png");
         setIconImage(icon.getImage());
 
-        getContentPane().setBackground(new Color(65, 65, 65)); // Set window color
+        getContentPane().setBackground(new Color(23, 15, 17)); // Set window color
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximize window
 
         setLayout(null);
@@ -68,6 +70,8 @@ public class BreakoutGUI extends JFrame {
         topButton = new JButton("<html><h1>BREAKOUT - CLICK TO EXIT</h1></html>");
         topButton.setSelected(false);
         topButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        topButton.setBackground(new Color(64, 32, 57));
+        topButton.setForeground(new Color(226, 252, 239));
         topButton.setBounds(0, 0, width, height / 15);
         add(topButton);
 
@@ -75,7 +79,7 @@ public class BreakoutGUI extends JFrame {
         // Create label to state game over
         gameOver = new JLabel("GAME OVER");
         gameOver.setBounds((width / 2) - (width / 6), (height / 2) - (height / 10), width / 3, height / 5);
-        gameOver.setForeground(Color.RED);
+        gameOver.setForeground(new Color(155, 40, 123));
         gameOver.setFont(new Font("Serif", Font.BOLD, width / 20));
         gameOver.setVisible(false);
         add(gameOver);
@@ -83,7 +87,7 @@ public class BreakoutGUI extends JFrame {
         // Create label to state game won
         youWin = new JLabel("YOU WIN");
         youWin.setBounds((width / 2) - (width / 6), (height / 2) - (height / 10), width / 3, height / 5);
-        youWin.setForeground(Color.RED);
+        youWin.setForeground(new Color(155, 40, 123));
         youWin.setFont(new Font("Serif", Font.BOLD, width / 20));
         youWin.setVisible(false);
         add(youWin);
@@ -110,20 +114,31 @@ public class BreakoutGUI extends JFrame {
         TimerTask move = new TimerTask() {
             @Override
             public void run() {
-                if (game.loopGame() == 0) {
+                if (game.loopGame() == 0) { // Game lost
                     timer.cancel();
                     gameOver.setVisible(true);
-                } else if (game.loopGame() == 2){
+                } else if (game.loopGame() == 2) { // Game won
                     timer.cancel();
                     youWin.setVisible(true);
                 }
             }
         };
-        
+
+        // Close program when clicking button
         topButton.addActionListener((ActionEvent e) -> {
-            System.out.println("Closing game...");
             timer.cancel();
             dispose();
+        });
+
+        // Change button color on mouse hover
+        topButton.addMouseListener(new MouseInputAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                topButton.setBackground(new Color(155, 40, 123));
+            }
+
+            public void mouseExited(MouseEvent e) {
+                topButton.setBackground(new Color(64, 32, 57));
+            }
         });
 
         timer.scheduleAtFixedRate(move, 0, DELAY);

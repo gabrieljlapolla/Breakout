@@ -129,7 +129,7 @@ public class Breakout {
     }
 
     /**
-     * @return Returns 0 if game is over
+     * @return Returns 0 if game is over, 1 if still in game, and 2 if game is won
      */
     public int loopGame() {
         // Get mouse x location
@@ -158,6 +158,7 @@ public class Breakout {
             }
         }
 
+        // Check if all bricks are destroyed
         if (checkBricks() == -1) {
             level.numBricks--;
             if (level.numBricks == 0) {

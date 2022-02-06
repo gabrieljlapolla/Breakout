@@ -41,14 +41,14 @@ public class Brick extends JComponent {
 
     // This method paints the brick
     protected void paintComponent(Graphics g) {
-        g.setColor(Color.RED);
+        g.setColor(new Color(92, 22, 78));
         g.fillRect(0, 0, getSize().width - 1, getSize().height - 1);
         super.paintComponent(g);
     }
 
     protected void paintBorder(Graphics g) {
         setBorder(border);
-        g.setColor(Color.BLACK);
+        g.setColor(new Color(155, 40, 123));
         g.drawRect(0, 0, getSize().width - 1, getSize().height - 1);
     }
 }

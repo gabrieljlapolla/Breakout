@@ -77,13 +77,13 @@ public class Ball extends JComponent {
     }
     
     protected void paintComponent(Graphics g) {
-        g.setColor(Color.gray);
+        g.setColor(new Color(155, 40, 123));
         g.fillOval(0, 0, getSize().width - 1, getSize().height - 1);
         super.paintComponent(g);
     }
 
     protected void paintBorder(Graphics g) {
-    g.setColor(Color.darkGray);
+    g.setColor(new Color(92, 22, 78));
     g.drawOval(0, 0, getSize().width - 1, getSize().height - 1);
   }
 }
