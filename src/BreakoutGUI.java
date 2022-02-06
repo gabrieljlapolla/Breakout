@@ -26,6 +26,7 @@ public class BreakoutGUI extends JFrame {
     private Level level;
     private JButton topButton;
     private JLabel gameOver;
+    private JLabel youWin;
     private Breakout game;
 
     public BreakoutGUI() {
@@ -70,6 +71,7 @@ public class BreakoutGUI extends JFrame {
         topButton.setBounds(0, 0, width, height / 15);
         add(topButton);
 
+        // TODO: actually center both labels
         // Create label to state game over
         gameOver = new JLabel("GAME OVER");
         gameOver.setBounds((width / 2) - (width / 6), (height / 2) - (height / 10), width / 3, height / 5);
@@ -77,6 +79,14 @@ public class BreakoutGUI extends JFrame {
         gameOver.setFont(new Font("Serif", Font.BOLD, width / 20));
         gameOver.setVisible(false);
         add(gameOver);
+
+        // Create label to state game won
+        youWin = new JLabel("YOU WIN");
+        youWin.setBounds((width / 2) - (width / 6), (height / 2) - (height / 10), width / 3, height / 5);
+        youWin.setForeground(Color.RED);
+        youWin.setFont(new Font("Serif", Font.BOLD, width / 20));
+        youWin.setVisible(false);
+        add(youWin);
 
         // Create and add paddle to window
         paddle = new Paddle();
@@ -103,6 +113,9 @@ public class BreakoutGUI extends JFrame {
                 if (game.loopGame() == 0) {
                     timer.cancel();
                     gameOver.setVisible(true);
+                } else if (game.loopGame() == 2){
+                    timer.cancel();
+                    youWin.setVisible(true);
                 }
             }
         };

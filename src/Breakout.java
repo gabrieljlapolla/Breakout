@@ -97,7 +97,7 @@ public class Breakout {
      * @return 0 if no bricks are hit or -1 if one is hit
      *
      */
-    public int checkBricks() { // TODO: add winning message if all bricks are destroyed
+    public int checkBricks() {
         // Get ball location
         int ballX = ball.getX();
         int ballY = ball.getY();
@@ -158,7 +158,12 @@ public class Breakout {
             }
         }
 
-        checkBricks();
+        if (checkBricks() == -1) {
+            level.numBricks--;
+            if (level.numBricks == 0) {
+                return 2;
+            }
+        }
 
         return 1;
     }

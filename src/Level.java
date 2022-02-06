@@ -1,3 +1,4 @@
+
 /**
  * Contains variables and methods for creating and managing the game level
  * including the bricks in the game
@@ -14,9 +15,9 @@ public class Level {
 
     private int numBricksPerRow;
     private int numBricksPerColumn;
-    private int numBricks;
+    public int numBricks;
     private Brick[] brickList;
-    
+
     public Level(int numBricksPerRow, int numBricksPerColumn) {
         this.numBricksPerRow = numBricksPerRow;
         this.numBricksPerColumn = numBricksPerColumn;
@@ -28,6 +29,10 @@ public class Level {
 
     public void setNumBricksPerColumn(int numRows) {
         this.numBricksPerColumn = numRows;
+    }
+
+    public void setNumBricks(int numBricks) {
+        this.numBricks = numBricks;
     }
 
     public int getNumBricksPerRow() {
@@ -50,14 +55,15 @@ public class Level {
      * This method adds the bricks to the window
      *
      * @author Gabriel Lapolla
-     * @param numRows Number of brick rows
+     * @param numRows    Number of brick rows
      * @param numColumns Number of brick columns
-     * @param height The window height
-     * @param width The window width
-     * @param window The game window
+     * @param height     The window height
+     * @param width      The window width
+     * @param window     The game window
      */
     public void addBricks(int numRows, int numColumns, int height, int width,
             JFrame window) {
+        this.numBricks = numBricksPerColumn * numBricksPerRow;
         Border lineBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 
         // Add bricks on top of playspace
