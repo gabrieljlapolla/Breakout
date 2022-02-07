@@ -4,9 +4,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.border.Border;
 
 /**
  *
@@ -27,10 +25,7 @@ public class Paddle extends JComponent {
     }
     
     public void initPaddle(int windowWidth, int windowHeight) {
-       Border compoundBorder = BorderFactory.createCompoundBorder();
-
-        setBorder(compoundBorder);
-        setSize(windowWidth / 15, windowHeight / 75);
+        setSize(windowWidth / 10, windowHeight / 75);
         setBounds((windowWidth / 2) - (getSize().width / 2), windowHeight / 15 * 13,
                 getSize().width, getSize().height);
     }
