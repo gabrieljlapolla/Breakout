@@ -62,11 +62,12 @@ public class Ball extends JComponent {
     }
 
     /**
-     * Sets random velocity based from 0 to 1
+     * Sets random xVelocity based from 0 to 1
+     * Sets yVelocity based on xVelocity with an added velocity of 2
      */
     public void setRandomVelocity() {
         setXVelocity(Math.random());
-        setYVelocity(Math.random());
+        setYVelocity(2 - xVelocity);
     }
 
     /**
