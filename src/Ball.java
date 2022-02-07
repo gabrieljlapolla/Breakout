@@ -10,6 +10,7 @@ public class Ball extends JComponent {
 
     private double xVelocity;
     private double yVelocity;
+    private final double MIN_VELOCITY = 0.1;
     private double xCoord;
     private double yCoord;
 
@@ -64,14 +65,29 @@ public class Ball extends JComponent {
      * Sets random velocity based from 0 to 1
      */
     public void setRandomVelocity() {
-        xVelocity = Math.random();
-        yVelocity = Math.random();
+        setXVelocity(Math.random());
+        setYVelocity(Math.random());
     }
 
     /**
      * Moves location of ball based on current velocties and coordinates
      */
     public void moveBall() {
+        // Makesure ball doesn't have too low of a velocity
+        if (Math.abs(xVelocity) < MIN_VELOCITY) {
+            if (xVelocity < 0) {
+                xVelocity = -MIN_VELOCITY;
+            } else {
+                xVelocity = MIN_VELOCITY;
+            }
+        }
+        if (Math.abs(yVelocity) < MIN_VELOCITY) {
+            if (yVelocity < 0) {
+                yVelocity = -MIN_VELOCITY;
+            } else {
+                yVelocity = MIN_VELOCITY;
+            }
+        }
         xCoord += xVelocity;
         yCoord += yVelocity;
         setBounds((int) xCoord, (int) yCoord, getSize().width, getSize().width);
@@ -79,8 +95,13 @@ public class Ball extends JComponent {
 
     protected void paintComponent(Graphics g) {
         g.setColor(new Color(155, 40, 123));
-        //g.fillOval((int) xCoord, (int) yCoord, getSize().width - 1, getSize().height - 1);
+        // g.fillOval((int) xCoord, (int) yCoord, getSize().width - 1, getSize().height
+        // - 1);
         g.fillOval(0, 0, getSize().width - 1, getSize().height - 1);
         super.paintComponent(g);
+    }
+
+    public String toString() {
+        return String.format("xCoord: %f yCoord: %f xVelocity: %f yVelocity: %f", xCoord, yCoord, xVelocity, yVelocity);
     }
 }
