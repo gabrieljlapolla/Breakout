@@ -44,34 +44,38 @@ public class Breakout {
      */
     public int checkBall() {
         // Check if ball has hit a side, top, or bottom
-        if (ball.getX() <= 0 || ball.getX() >= WIDTH - ball.getWidth()) { // Side
-            ball.setxVelocity(-ball.getxVelocity());
+        if (ball.getXCoord() <= 0 || ball.getXCoord() >= WIDTH - ball.getWidth()) { // Side
+            ball.setXVelocity(-ball.getXVelocity());
             System.out.println("Ball hit side.");
         }
-        if (ball.getY() <= HEIGHT / 15) { // Top
-            ball.setyVelocity(-ball.getyVelocity());
+        if (ball.getYCoord() <= HEIGHT / 15) { // Top
+            ball.setYVelocity(-ball.getYVelocity());
             System.out.println("Ball hit top.");
-        } else if (ball.getY() >= HEIGHT) { // Bottom
+        } else if (ball.getYCoord() >= HEIGHT) { // Bottom
             System.out.println("Ball hit bottom.");
             return -1;
         }
 
         // TODO: Change ball angle when hitting different locations on paddle
         // Check if ball hits paddle when ball is near paddle
-        if (ball.getY() >= paddle.getY() - paddle.getHeight()
-                && ball.getY() < paddle.getY()) {
-            if (ball.getX() > paddle.getX()
-                    && ball.getX() < paddle.getX() + paddle.getWidth()) {
-                // Get lcoation on paddle where ball hit (0-100 from left)
-                int hitLoc = (ball.getX() - paddle.getX()) * 100 / paddle.getWidth();
+        if (ball.getYCoord() >= paddle.getY() - paddle.getHeight()
+                && ball.getYCoord() < paddle.getY()) {
+            if (ball.getXCoord() > paddle.getX()
+                    && ball.getXCoord() < paddle.getX() + paddle.getWidth()) {
+                // Get location on paddle where ball hit (0-100 from left)
+                int hitLoc = ((int) ball.getXCoord() - paddle.getX()) * 100 / paddle.getWidth();
                 System.out.printf("Bounce off paddle at %d\n", hitLoc);
-                ball.setyVelocity(-ball.getyVelocity());
+                ball.setYVelocity(-ball.getYVelocity());
+                /*if (hitLoc < 50) { // Hits left side of paddle
+                    ball.setyVelocity(-ball.getYVelocity() * (hitLoc / 100));
+                } else{ // Hits right side of paddle
+                    ball.setyVelocity(-ball.getYVelocity()* (hitLoc / 100));
+                }*/
+                System.out.println("Ball yVelocity: " + ball.getYVelocity());
             }
         }
 
-        // Move ball based on velocity
-        ball.setBounds(ball.getX() + ball.getxVelocity(),
-                ball.getY() + ball.getyVelocity(), WIDTH / 100, WIDTH / 100);
+        ball.moveBall();
         return 0;
     }
 
@@ -108,12 +112,13 @@ public class Breakout {
             if (ballX >= brickX && ballX <= brickX + b.getWidth()
                     && ballY >= brickY && ballY <= brickY + b.getHeight()) {
 
+                // FIXME: weird collisions with bricks
                 // Check if ball hit side or top/bottom
                 if (ballX < brickX + 5 || ballX > brickX + b.getWidth() + 5) {
-                    ball.setxVelocity(-ball.getxVelocity());
+                    ball.setXVelocity(-ball.getXVelocity());
                     System.out.println("Hit side of a brick.");
                 } else {
-                    ball.setyVelocity(-ball.getyVelocity());
+                    ball.setYVelocity(-ball.getYVelocity());
                     System.out.println("Hit top/bottom of a brick.");
                 }
 
@@ -150,14 +155,14 @@ public class Breakout {
                 System.out.println("Lives: " + lives);
                 // TODO: add lives counter on screen
                 lives--;
-                ball.initBall();
+                ball.initBall(WIDTH, HEIGHT, ball.getSize().width);
+                
             } else {
                 window.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 System.out.println("Out of lives: Game over!");
                 return 0;
             }
         }
-
         // Check if all bricks are destroyed
         if (checkBricks() == -1) {
             level.numBricks--;

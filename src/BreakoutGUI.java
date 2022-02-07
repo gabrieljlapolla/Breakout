@@ -22,7 +22,7 @@ public class BreakoutGUI extends JFrame {
 
     private int width;
     private int height;
-    private final int DELAY = 5;
+    private final int DELAY = 2;
     private Paddle paddle;
     private Ball ball;
     private Level level;
@@ -98,8 +98,8 @@ public class BreakoutGUI extends JFrame {
         add(paddle);
 
         // Create ball and add to window
-        ball = new Ball(width, height, width / 100);
-        ball.initBall();
+        ball = new Ball();
+        ball.initBall(width, height, width / 100);
         add(ball);
 
         // Create level and bricks
@@ -113,7 +113,7 @@ public class BreakoutGUI extends JFrame {
         Timer timer = new Timer();
         TimerTask move = new TimerTask() {
             @Override
-            public void run() {
+            public void run() { // FIXME: stop program correctly when window is forced closed
                 if (game.loopGame() == 0) { // Game lost
                     timer.cancel();
                     gameOver.setVisible(true);

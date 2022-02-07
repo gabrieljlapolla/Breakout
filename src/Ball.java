@@ -1,12 +1,5 @@
-/** *************************************************************************
- * Revision History 
- ****************************************************************************
- * 12/18/20 Written by Gabriel Lapolla
- ****************************************************************************/
-
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.Random;
 import javax.swing.JComponent;
 
 /**
@@ -14,76 +7,80 @@ import javax.swing.JComponent;
  * @author Gabriel Lapolla
  */
 public class Ball extends JComponent {
-    
-    
-    private final int windowY;
-    private final int windowX;
-    private int xVelocity;
-    private int yVelocity;
-    private int radius;
-    // TODO: implement better velocity system to allow finer speed differences
-    //       use doubles to hold xCoord and yCoord
 
-    public Ball(int windowY, int windowX, int radius) {
-        this.windowY = windowY;
-        this.windowX = windowX;
-        this.radius = radius;
+    private double xVelocity;
+    private double yVelocity;
+    private double xCoord;
+    private double yCoord;
+
+    public Ball() {
     }
 
-    public void setxVelocity(int xVelocity){
+    public void setXVelocity(double xVelocity) {
         this.xVelocity = xVelocity;
     }
-    
-    public void setyVelocity(int yVelocity){
+
+    public void setYVelocity(double yVelocity) {
         this.yVelocity = yVelocity;
     }
-    
-    public int getxVelocity() {
+
+    public void setXCoord(double xCoord) {
+        this.xCoord = xCoord;
+    }
+
+    public void setYCoord(double yCoord) {
+        this.yCoord = yCoord;
+    }
+
+    public double getXVelocity() {
         return xVelocity;
     }
-    
-    public int getyVelocity() {
+
+    public double getYVelocity() {
         return yVelocity;
     }
-    
-    public int getRadius(){
-        return this.radius;
+
+    public double getXCoord() {
+        return xCoord;
     }
-    
+
+    public double getYCoord() {
+        return yCoord;
+    }
+
     /**
      * Sets default values and velocity based off a multiplier
      */
-    public void initBall(){
+    public void initBall(int windowWidth, int windowHeight, int size) {
         setBackground(Color.GRAY);
         setFocusable(false);
-        setBounds(windowY/2, windowX/2, radius, radius);
-        setRandomVelocity(1);
+        xCoord = windowWidth / 2;
+        yCoord = windowHeight / 2;
+        setBounds((int) xCoord, (int) yCoord, size, size);
+        setRandomVelocity();
     }
-    
+
     /**
-     * Sets random velocity based on multiplier
-     * @param multiplier A multiplier to change velocity
+     * Sets random velocity based from 0 to 1
      */
-    public void setRandomVelocity(int multiplier){
-        Random random = new Random();
-        // Get a random negative to modify direction
-        int negative = 0;
-        while (negative == 0) { // Get 1 or -1
-            negative = random.nextInt(3) - 1;
-        }
-        // Random between 1 -> 3
-        xVelocity = (random.nextInt(3) + 1) * multiplier * negative; 
-        yVelocity = (random.nextInt(3) + 1) * multiplier * negative;
+    public void setRandomVelocity() {
+        xVelocity = Math.random();
+        yVelocity = Math.random();
     }
-    
+
+    /**
+     * Moves location of ball based on current velocties and coordinates
+     */
+    public void moveBall() {
+        xCoord += xVelocity;
+        yCoord += yVelocity;
+        setBounds((int) xCoord, (int) yCoord, getSize().width, getSize().width);
+    }
+
     protected void paintComponent(Graphics g) {
         g.setColor(new Color(155, 40, 123));
+        //g.fillOval((int) xCoord, (int) yCoord, getSize().width - 1, getSize().height - 1);
         g.fillOval(0, 0, getSize().width - 1, getSize().height - 1);
         super.paintComponent(g);
     }
-
-    protected void paintBorder(Graphics g) {
-    g.setColor(new Color(92, 22, 78));
-    g.drawOval(0, 0, getSize().width - 1, getSize().height - 1);
-  }
 }
