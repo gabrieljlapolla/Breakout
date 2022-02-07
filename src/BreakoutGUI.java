@@ -114,12 +114,15 @@ public class BreakoutGUI extends JFrame {
         TimerTask move = new TimerTask() {
             @Override
             public void run() { // FIXME: stop program correctly when window is forced closed
-                if (game.loopGame() == 0) { // Game lost
-                    timer.cancel();
-                    gameOver.setVisible(true);
-                } else if (game.loopGame() == 2) { // Game won
-                    timer.cancel();
-                    youWin.setVisible(true);
+                switch (game.loopGame()){
+                        case 0:
+                            timer.cancel();
+                            gameOver.setVisible(true);
+                            break;
+                        case 2:
+                            timer.cancel();
+                            youWin.setVisible(true);
+                            break;
                 }
             }
         };
