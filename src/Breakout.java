@@ -56,23 +56,29 @@ public class Breakout {
             return -1;
         }
 
-        // TODO: Change ball angle when hitting different locations on paddle
         // Check if ball hits paddle when ball is near paddle
         if (ball.getYCoord() >= paddle.getY() - paddle.getHeight()
                 && ball.getYCoord() < paddle.getY()) {
             if (ball.getXCoord() > paddle.getX()
                     && ball.getXCoord() < paddle.getX() + paddle.getWidth()) {
                 // Get location on paddle where ball hit (0-100 from left)
-                int hitLoc = ((int) ball.getXCoord() - paddle.getX()) * 100 / paddle.getWidth();
-                System.out.printf("Bounce off paddle at %d\n", hitLoc);
-                ball.setYVelocity(-ball.getYVelocity());
-                /*if (hitLoc < 50) { // Hits left side of paddle
-                    ball.setyVelocity(-ball.getYVelocity() * (hitLoc / 100));
-                } else{ // Hits right side of paddle
-                    ball.setyVelocity(-ball.getYVelocity()* (hitLoc / 100));
-                }*/
-                System.out.println("Ball yVelocity: " + ball.getYVelocity());
+                double hitLoc = ((int) ball.getXCoord() - paddle.getX()) * 100 / paddle.getWidth();
+                System.out.printf("Bounce off paddle at %f\n", hitLoc);
+
+                // Change ball velocity based on where on the paddle it hits
+                // the edges of the paddle change the velocity more than near the center
+                if (hitLoc < 50) { // Hits left side of paddle
+                    ball.setYVelocity(-ball.getYVelocity());
+                    System.out.println("xvelocity before: " + ball.getXVelocity());
+                    ball.setXVelocity(ball.getXVelocity() - ((50 - hitLoc) / 100));
+                    System.out.println("xvelocity after: " + ball.getXVelocity());
+                } else { // Hits right side of paddle
+                    ball.setYVelocity(-ball.getYVelocity());
+                    ball.setXVelocity(ball.getXVelocity() + ((50 - (hitLoc - 50)) / 100));
+                }
             }
+            ball.moveBall();
+            System.out.println(ball.toString());
         }
 
         ball.moveBall();
@@ -112,7 +118,7 @@ public class Breakout {
             if (ballX >= brickX && ballX <= brickX + b.getWidth()
                     && ballY >= brickY && ballY <= brickY + b.getHeight()) {
 
-                // FIXME: weird collisions with bricks
+                // FIXME: weird collisions with top and sides of bricks
                 // Check if ball hit side or top/bottom
                 if (ballX < brickX + 5 || ballX > brickX + b.getWidth() + 5) {
                     ball.setXVelocity(-ball.getXVelocity());
@@ -156,7 +162,7 @@ public class Breakout {
                 // TODO: add lives counter on screen
                 lives--;
                 ball.initBall(WIDTH, HEIGHT, ball.getSize().width);
-                
+
             } else {
                 window.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 System.out.println("Out of lives: Game over!");
