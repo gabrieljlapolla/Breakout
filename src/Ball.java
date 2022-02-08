@@ -1,5 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Random;
+
 import javax.swing.JComponent;
 
 /**
@@ -8,6 +10,7 @@ import javax.swing.JComponent;
  */
 public class Ball extends JComponent {
 
+    // TODO: better velocity system where combined velocity is constant
     private double xVelocity;
     private double yVelocity;
     private final double MIN_VELOCITY = 0.1;
@@ -63,11 +66,13 @@ public class Ball extends JComponent {
 
     /**
      * Sets random xVelocity based from 0 to 1
-     * Sets yVelocity based on xVelocity with an added velocity of 2
+     * Sets yVelocity based on xVelocity with a combined velocity of 2
      */
     public void setRandomVelocity() {
-        setXVelocity(Math.random());
-        setYVelocity(2 - xVelocity);
+        Random random = new Random();
+        setXVelocity(Math.random() * (random.nextBoolean() ? 1 : -1));
+        // Negative yVelocity so ball goes up initally
+        setYVelocity(-2 - Math.abs(xVelocity));
     }
 
     /**
