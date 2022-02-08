@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import javax.swing.event.MouseInputAdapter;
 
 /**
@@ -75,19 +76,18 @@ public class BreakoutGUI extends JFrame {
         topButton.setBounds(0, 0, width, height / 15);
         add(topButton);
 
-        // TODO: actually center both labels
         // Create label to state game over
-        gameOver = new JLabel("GAME OVER");
+        gameOver = new JLabel("GAME OVER", SwingConstants.CENTER);
         gameOver.setBounds((width / 2) - (width / 6), (height / 2) - (height / 10), width / 3, height / 5);
-        gameOver.setForeground(new Color(155, 40, 123));
+        gameOver.setForeground(new Color(226, 252, 239));
         gameOver.setFont(new Font("Serif", Font.BOLD, width / 20));
         gameOver.setVisible(false);
         add(gameOver);
 
         // Create label to state game won
-        youWin = new JLabel("YOU WIN");
+        youWin = new JLabel("YOU WIN", SwingConstants.CENTER);
         youWin.setBounds((width / 2) - (width / 6), (height / 2) - (height / 10), width / 3, height / 5);
-        youWin.setForeground(new Color(155, 40, 123));
+        youWin.setForeground(new Color(226, 252, 239));
         youWin.setFont(new Font("Serif", Font.BOLD, width / 20));
         youWin.setVisible(false);
         add(youWin);
