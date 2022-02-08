@@ -1,39 +1,72 @@
 import java.awt.AWTException;
-import java.awt.Cursor;
 import java.awt.MouseInfo;
 import java.awt.Robot;
-import javax.swing.JFrame;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javax.swing.JFrame;
 /**
  *
  * @author Gabriel Lapolla
  */
 public class Breakout {
 
+    private BreakoutGUI gui;
     private Paddle paddle;
     private Ball ball;
     private Level level;
-    private final int WIDTH;
-    private final int HEIGHT;
+    private final int SCREEN_WIDTH;
+    private final int SCREEN_HEIGHT;
+    private int DELAY = 2;
+    public int lives = 3;
     private JFrame window;
-    private int lives = 3;
     private Robot mouseControl;
 
-    public Breakout(Ball ball, Level level, Paddle paddle,
-            int width, int height, JFrame window) {
-        this.ball = ball;
-        this.level = level;
-        this.paddle = paddle;
-        this.WIDTH = width;
-        this.HEIGHT = height;
-        this.window = window;
+    public Breakout() {
+        gui = new BreakoutGUI(ball, paddle);
+        window = gui;
+        SCREEN_WIDTH = gui.getScreenWidth();
+        SCREEN_HEIGHT = gui.getScreenHeight();
+        initGame();
+    }
+
+    private void initGame() {
+        ball = new Ball();
+        ball.initBall(SCREEN_WIDTH, SCREEN_HEIGHT);
+        level = new Level(5, 1);
+        paddle = new Paddle();
+        paddle.initPaddle(SCREEN_WIDTH, SCREEN_HEIGHT);
         try {
             mouseControl = new Robot();
         } catch (AWTException e) {
             System.err.println("Error initializing game");
         }
-        level.addBricks(10, 10, HEIGHT, WIDTH, window);
+        level.addBricks(10, 10, SCREEN_HEIGHT, SCREEN_WIDTH, window);
+
+        gui.initialize(ball, paddle);
+
+        // Timer to loop game logic every DELAY ms
+        Timer timer = new Timer();
+        TimerTask move = new TimerTask() {
+            @Override
+            public void run() { // FIXME: stop program correctly when window is forced closed
+                switch (loopGame()) {
+                    case 0:
+                        timer.cancel();
+                        gui.gameOver();
+                        break;
+                    case 2:
+                        timer.cancel();
+                        gui.youWin();
+                        break;
+                }
+            }
+        };
+
+        gui.createEvents(timer);
         window.repaint();
+
+        timer.scheduleAtFixedRate(move, 0, DELAY);
     }
 
     /**
@@ -44,15 +77,12 @@ public class Breakout {
      */
     public int checkBall() {
         // Check if ball has hit a side, top, or bottom
-        if (ball.getXCoord() <= 0 || ball.getXCoord() >= WIDTH - ball.getWidth()) { // Side
+        if (ball.getXCoord() <= 0 || ball.getXCoord() >= SCREEN_WIDTH - ball.getWidth()) { // Side
             ball.setXVelocity(-ball.getXVelocity());
-            System.out.println("Ball hit side.");
         }
-        if (ball.getYCoord() <= HEIGHT / 15) { // Top
+        if (ball.getYCoord() <= SCREEN_HEIGHT / 15) { // Top
             ball.setYVelocity(-ball.getYVelocity());
-            System.out.println("Ball hit top.");
-        } else if (ball.getYCoord() >= HEIGHT) { // Bottom
-            System.out.println("Ball hit bottom.");
+        } else if (ball.getYCoord() >= SCREEN_HEIGHT) { // Bottom
             return -1;
         }
 
@@ -61,26 +91,18 @@ public class Breakout {
                 && ball.getYCoord() < paddle.getY()) {
             if (ball.getXCoord() > paddle.getX()
                     && ball.getXCoord() < paddle.getX() + paddle.getWidth()) {
-                // Get location on paddle where ball hit (0-100 from left)
-                double hitLoc = ((int) ball.getXCoord() - paddle.getX()) * 100 / paddle.getWidth();
-                System.out.printf("Bounce off paddle at %f\n", hitLoc);
-
                 // Change ball velocity based on where on the paddle it hits
                 // the edges of the paddle change the velocity more than near the center
+                double hitLoc = ((int) ball.getXCoord() - paddle.getX()) * 100 / paddle.getWidth();
                 if (hitLoc < 50) { // Hits left side of paddle
                     ball.setYVelocity(-ball.getYVelocity());
-                    System.out.println("xvelocity before: " + ball.getXVelocity());
                     ball.setXVelocity(ball.getXVelocity() - ((50 - hitLoc) / 100));
-                    System.out.println("xvelocity after: " + ball.getXVelocity());
                 } else { // Hits right side of paddle
                     ball.setYVelocity(-ball.getYVelocity());
                     ball.setXVelocity(ball.getXVelocity() + ((50 - (hitLoc - 50)) / 100));
                 }
             }
-            ball.moveBall();
-            System.out.println(ball.toString());
         }
-
         ball.moveBall();
         return 0;
     }
@@ -94,7 +116,7 @@ public class Breakout {
     public void movePaddle(int mouseX) {
         // Don't move paddle outside window
         if (mouseX >= paddle.getWidth() / 2
-                && mouseX <= WIDTH - paddle.getWidth() / 2) {
+                && mouseX <= SCREEN_WIDTH - paddle.getWidth() / 2) {
             // Move paddle to mouse's x location
             paddle.setBounds(mouseX - paddle.getWidth() / 2, paddle.getY(),
                     paddle.getWidth(), paddle.getHeight());
@@ -122,10 +144,8 @@ public class Breakout {
                 // Check if ball hit side or top/bottom
                 if (ballX < brickX + 5 || ballX > brickX + b.getWidth() + 5) {
                     ball.setXVelocity(-ball.getXVelocity());
-                    System.out.println("Hit side of a brick.");
                 } else {
                     ball.setYVelocity(-ball.getYVelocity());
-                    System.out.println("Hit top/bottom of a brick.");
                 }
 
                 // TODO: Change way bricks are removed from window and brickList
@@ -143,40 +163,38 @@ public class Breakout {
      * @return Returns 0 if game is over, 1 if still in game, and 2 if game is won
      */
     public int loopGame() {
-        // Get mouse x location
         int mouseX = MouseInfo.getPointerInfo().getLocation().x;
         // Move back cursor if it goes too far
         if (mouseX < 0) {
             mouseControl.mouseMove(0, MouseInfo.getPointerInfo().getLocation().y);
-        } else if (mouseX > WIDTH) {
-            mouseControl.mouseMove(WIDTH,
+        } else if (mouseX > SCREEN_WIDTH) {
+            mouseControl.mouseMove(SCREEN_WIDTH,
                     MouseInfo.getPointerInfo().getLocation().y);
         }
 
         movePaddle(mouseX);
 
-        // Check if ball is out of bounds
+        // Check if ball is out of bounds or has collided with anything
         if (checkBall() == -1) {
             if (lives > 1) {
-                System.out.println("Lives: " + lives);
                 // TODO: add lives counter on screen
                 lives--;
-                ball.initBall(WIDTH, HEIGHT, ball.getSize().width);
-
+                ball.initBall(SCREEN_WIDTH, SCREEN_HEIGHT);
             } else {
-                window.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                System.out.println("Out of lives: Game over!");
-                return 0;
+                return 0; // Game lost
             }
         }
-        // Check if all bricks are destroyed
+        // Check if a brick is destroyed
         if (checkBricks() == -1) {
             level.numBricks--;
             if (level.numBricks == 0) {
-                return 2;
+                return 2; // Game won
             }
         }
-
         return 1;
+    }
+
+    public static void main(String[] args) {
+        new Breakout();
     }
 }

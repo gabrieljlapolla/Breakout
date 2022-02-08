@@ -55,12 +55,12 @@ public class Ball extends JComponent {
     /**
      * Sets default values and velocity based off a multiplier
      */
-    public void initBall(int windowWidth, int windowHeight, int size) {
+    public void initBall(int windowWidth, int windowHeight) {
         setBackground(Color.GRAY);
         setFocusable(false);
-        xCoord = windowWidth / 2;
-        yCoord = windowHeight / 2;
-        setBounds((int) xCoord, (int) yCoord, size, size);
+        this.xCoord = windowWidth / 2;
+        this.yCoord = windowHeight / 2;
+        setBounds((int) xCoord, (int) yCoord, windowWidth / 100, windowWidth / 100);
         setRandomVelocity();
     }
 
