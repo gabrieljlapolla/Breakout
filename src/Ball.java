@@ -10,10 +10,10 @@ import javax.swing.JComponent;
  */
 public class Ball extends JComponent {
 
-    // TODO: better velocity system where combined velocity is constant
     private double xVelocity;
     private double yVelocity;
-    private final double MIN_VELOCITY = 0.1;
+    private final double MIN_VELOCITY = 0.2;
+    private final double MAX_VELOCITY = 2;
     private double xCoord;
     private double yCoord;
 
@@ -70,9 +70,27 @@ public class Ball extends JComponent {
      */
     public void setRandomVelocity() {
         Random random = new Random();
-        setXVelocity(Math.random() * (random.nextBoolean() ? 1 : -1));
+        xVelocity = Math.random() * (random.nextBoolean() ? 1 : -1);
         // Negative yVelocity so ball goes up initally
-        setYVelocity(-2 - Math.abs(xVelocity));
+        yVelocity = -(MAX_VELOCITY - Math.abs(xVelocity));
+    }
+
+    /**
+     * Increases xVelocity but also changes yVelocity to keep a combined total
+     * velocity of MAX_VELOCITY
+     * 
+     * @param increaseAmount Amount to increase xVelocity by
+     */
+    public void changeXVelocity(double increaseAmount) {
+        // if xVelocity would exceed max velocity,
+        // set it to max velocity - min velocity and set yVelocity to min
+        if (Math.abs(xVelocity + increaseAmount) >= MAX_VELOCITY) {
+            xVelocity = (xVelocity > 0) ? MAX_VELOCITY - MIN_VELOCITY : -(MAX_VELOCITY - MIN_VELOCITY);
+            yVelocity = (yVelocity > 0) ? MIN_VELOCITY : -MIN_VELOCITY;
+        } else {
+            xVelocity += increaseAmount;
+            yVelocity = (yVelocity > 0) ? MAX_VELOCITY - Math.abs(xVelocity) : -(MAX_VELOCITY - Math.abs(xVelocity));
+        }
     }
 
     /**

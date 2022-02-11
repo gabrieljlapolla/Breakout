@@ -33,7 +33,7 @@ public class Breakout {
     private void initGame() {
         ball = new Ball();
         ball.initBall(SCREEN_WIDTH, SCREEN_HEIGHT);
-        level = new Level(5, 1);
+        level = new Level(5, 5);
         paddle = new Paddle();
         paddle.initPaddle(SCREEN_WIDTH, SCREEN_HEIGHT);
         try {
@@ -95,11 +95,11 @@ public class Breakout {
                 // the edges of the paddle change the velocity more than near the center
                 double hitLoc = ((int) ball.getXCoord() - paddle.getX()) * 100 / paddle.getWidth();
                 if (hitLoc < 50) { // Hits left side of paddle
+                    ball.changeXVelocity(- ((50 - hitLoc) / 100));
                     ball.setYVelocity(-ball.getYVelocity());
-                    ball.setXVelocity(ball.getXVelocity() - ((50 - hitLoc) / 100));
                 } else { // Hits right side of paddle
+                    ball.changeXVelocity(((50 - (hitLoc - 50)) / 100));
                     ball.setYVelocity(-ball.getYVelocity());
-                    ball.setXVelocity(ball.getXVelocity() + ((50 - (hitLoc - 50)) / 100));
                 }
             }
         }
