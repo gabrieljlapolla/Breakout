@@ -1,11 +1,9 @@
 
 /**
  * Contains variables and methods for creating and managing the game level
- * including the bricks in the game
+ * including the bricks in the game which are stored in a linked list
  */
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
+import javax.swing.JFrame;
 
 /**
  *
@@ -16,7 +14,7 @@ public class Level {
     private int numBricksPerRow;
     private int numBricksPerColumn;
     public int numBricks;
-    private Brick[] brickList;
+    private Brick firstBrick;
 
     public Level(int numBricksPerRow, int numBricksPerColumn) {
         this.numBricksPerRow = numBricksPerRow;
@@ -47,24 +45,48 @@ public class Level {
         return numBricks;
     }
 
-    public Brick[] getBrickList() {
-        return brickList;
+    public Brick getFirstBrick() {
+        return firstBrick;
+    }
+
+    /**
+     * Removes a brick from the list of bricks and the window
+     * 
+     * @param destroyed The brick that has been destroyed
+     */
+    public void destroyBrick(Brick destroyed, JFrame window) throws Exception {
+        window.remove(destroyed); // Remove from JFrame
+        // Remove destroyed brick from linked list of bricks
+        Brick b = getFirstBrick();
+        if (b == destroyed) { // Destroyed is first brick in list
+            firstBrick = b.getNextBrick();
+        } else {
+            // Loop through list until destroyed brick is found
+            while (b.getNextBrick() != destroyed && b.getNextBrick() != null) {
+                b = b.getNextBrick();
+            }
+            if (b.getNextBrick() == null) {
+                throw new Exception("Brick not found in game");
+            }
+            if (destroyed.getNextBrick() == null) { // Destroyed brick is last brick in list
+                b.setNextBrick(null);
+            } else {
+                b.setNextBrick(destroyed.getNextBrick()); // Remove destroyed brick from list
+            }
+        }
+        window.repaint();
     }
 
     /**
      * This method adds the bricks to the window
      *
-     * @author Gabriel Lapolla
-     * @param numRows    Number of brick rows
-     * @param numColumns Number of brick columns
-     * @param height     The window height
-     * @param width      The window width
-     * @param window     The game window
+     * @param height The window height
+     * @param width  The window width
+     * @param window The game window
      */
-    public void addBricks(int numRows, int numColumns, int height, int width,
+    public void addBricks(int height, int width,
             JFrame window) {
         this.numBricks = numBricksPerColumn * numBricksPerRow;
-        Border lineBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 
         // Add bricks on top of playspace
         int brickWidth = (width - 200) / numBricksPerRow;
@@ -74,25 +96,26 @@ public class Level {
         int brickXSpacer = 0;
         int brickYSpacer = 0;
 
-        // Modify each brickX and brickY to alter location in loops
-        brickList = new Brick[numBricksPerRow * numBricksPerColumn];
-
-        int counter = 0;
-        for (int i = 0; i < brickList.length; i++) {
+        Brick current;
+        Brick prev = new Brick(brickX, brickY, null);
+        firstBrick = prev;
+        for (int i = 1; i <= numBricksPerRow * numBricksPerColumn; i++) {
             // Create brick object
-            brickList[i] = new Brick(brickX, brickY, lineBorder);
+            current = new Brick(brickX, brickY, null);
+            prev.setNextBrick(current);
+
             // Set brick location
-            brickList[i].setBounds(brickX, brickY, brickWidth, brickHeight);
-            brickList[i].setEnabled(false); // Turn off button
-            window.add(brickList[i]);
-            counter++;
+            current.setBounds(brickX, brickY, brickWidth, brickHeight);
+            current.setEnabled(false); // Turn off button
+            window.add(current);
             brickX += brickXSpacer + brickWidth;
 
             // Move to new row
-            if (counter % numBricksPerRow == 0) {
+            if (i % numBricksPerRow == 0) {
                 brickY += brickYSpacer + brickHeight;
                 brickX = width / 25;
             }
+            prev = current;
         }
     }
 }

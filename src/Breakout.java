@@ -41,7 +41,7 @@ public class Breakout {
         } catch (AWTException e) {
             System.err.println("Error initializing game");
         }
-        level.addBricks(10, 10, SCREEN_HEIGHT, SCREEN_WIDTH, window);
+        level.addBricks(SCREEN_HEIGHT, SCREEN_WIDTH, window);
 
         gui.initialize(ball, paddle);
 
@@ -134,14 +134,15 @@ public class Breakout {
         int ballX = ball.getX();
         int ballY = ball.getY();
         // TODO: Optimize checking if ball has hit a brick
-        for (Brick b : level.getBrickList()) {
+        Brick b = level.getFirstBrick();
+        while (b != null) {
             int brickX = b.getBrickX();
             int brickY = b.getBrickY();
             if (ballX >= brickX && ballX <= brickX + b.getWidth()
                     && ballY >= brickY && ballY <= brickY + b.getHeight()) {
 
                 // FIXME: weird collisions with top and sides of bricks
-                // Check if ball hit side or top/bottom
+                // Check if ball hit side or top/bottom of brick
                 if (ballX < brickX + 5 || ballX > brickX + b.getWidth() + 5) {
                     ball.setXVelocity(-ball.getXVelocity());
                 } else {
@@ -149,12 +150,15 @@ public class Breakout {
                 }
 
                 // TODO: Change way bricks are removed from window and brickList
-                window.remove(b);
-                b.setBrickX(0);
-                b.setBrickY(0);
-                window.repaint();
+                try {
+                    level.destroyBrick(b, window);
+                } catch (Exception e) {
+                    System.err.println("Error destroying brick.");
+                }
+                
                 return -1;
             }
+            b = b.getNextBrick();
         }
         return 0;
     }
