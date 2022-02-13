@@ -1,7 +1,7 @@
 
 /**
  * Contains variables and methods for creating and managing the game level
- * including the bricks in the game which are stored in a linked list
+ * including the bricks in the game which are stored in a doubly linked list
  */
 import javax.swing.JFrame;
 
@@ -15,30 +15,16 @@ public class Level {
     private int numBricksPerColumn;
     public int numBricks;
     private Brick firstBrick;
+    private Brick lastBrick;
 
     public Level(int numBricksPerRow, int numBricksPerColumn) {
         this.numBricksPerRow = numBricksPerRow;
         this.numBricksPerColumn = numBricksPerColumn;
-    }
-
-    public void setNumBricksPerRow(int numBricksPerRow) {
-        this.numBricksPerRow = numBricksPerRow;
-    }
-
-    public void setNumBricksPerColumn(int numRows) {
-        this.numBricksPerColumn = numRows;
+        this.numBricks = numBricksPerColumn * numBricksPerRow;
     }
 
     public void setNumBricks(int numBricks) {
         this.numBricks = numBricks;
-    }
-
-    public int getNumBricksPerRow() {
-        return numBricksPerRow;
-    }
-
-    public int getNumBricksPerColumn() {
-        return numBricksPerColumn;
     }
 
     public int getNumBricks() {
@@ -49,6 +35,10 @@ public class Level {
         return firstBrick;
     }
 
+    public Brick getLastBrick() {
+        return this.lastBrick;
+    }
+
     /**
      * Removes a brick from the list of bricks and the window
      * 
@@ -56,23 +46,18 @@ public class Level {
      */
     public void destroyBrick(Brick destroyed, JFrame window) throws Exception {
         window.remove(destroyed); // Remove from JFrame
-        // Remove destroyed brick from linked list of bricks
-        Brick b = getFirstBrick();
-        if (b == destroyed) { // Destroyed is first brick in list
-            firstBrick = b.getNextBrick();
-        } else {
-            // Loop through list until destroyed brick is found
-            while (b.getNextBrick() != destroyed && b.getNextBrick() != null) {
-                b = b.getNextBrick();
-            }
-            if (b.getNextBrick() == null) {
-                throw new Exception("Brick not found in game");
-            }
-            if (destroyed.getNextBrick() == null) { // Destroyed brick is last brick in list
-                b.setNextBrick(null);
-            } else {
-                b.setNextBrick(destroyed.getNextBrick()); // Remove destroyed brick from list
-            }
+        // Brick is only brick in list
+        if (destroyed.getNextBrick() == null && destroyed.getPrevBrick() == null) {
+            firstBrick = null;
+            lastBrick = null;
+        } else if (destroyed.getPrevBrick() == null) { // Destroyed brick is first brick
+            firstBrick = destroyed.getNextBrick();
+            destroyed.getNextBrick().setPrevBrick(null);
+        } else if (destroyed.getNextBrick() == null) { // Destroyed brick is last brick
+            destroyed.getPrevBrick().setNextBrick(null);
+        } else { // Remove references to destroyed brick from prev and next bricks
+            destroyed.getPrevBrick().setNextBrick(destroyed.getNextBrick());
+            destroyed.getNextBrick().setPrevBrick(destroyed.getPrevBrick());
         }
         window.repaint();
     }
@@ -84,38 +69,35 @@ public class Level {
      * @param width  The window width
      * @param window The game window
      */
-    public void addBricks(int height, int width,
-            JFrame window) {
-        this.numBricks = numBricksPerColumn * numBricksPerRow;
-
+    public void addBricks(int height, int width, JFrame window) {
         // Add bricks on top of playspace
         int brickWidth = (width - 200) / numBricksPerRow;
         int brickHeight = height / 40;
+        // Starting coordinates
         int brickX = width / 25;
         int brickY = (height / 15) + (height / 20);
-        int brickXSpacer = 0;
-        int brickYSpacer = 0;
 
         Brick current;
-        Brick prev = new Brick(brickX, brickY, null);
+        Brick prev = new Brick(brickX, brickY, null, null);
         firstBrick = prev;
-        for (int i = 1; i <= numBricksPerRow * numBricksPerColumn; i++) {
+        for (int i = 1; i <= numBricks; i++) {
             // Create brick object
-            current = new Brick(brickX, brickY, null);
+            current = new Brick(brickX, brickY, prev, null);
             prev.setNextBrick(current);
 
             // Set brick location
             current.setBounds(brickX, brickY, brickWidth, brickHeight);
             current.setEnabled(false); // Turn off button
             window.add(current);
-            brickX += brickXSpacer + brickWidth;
+            brickX += brickWidth;
 
             // Move to new row
             if (i % numBricksPerRow == 0) {
-                brickY += brickYSpacer + brickHeight;
+                brickY += brickHeight;
                 brickX = width / 25;
             }
             prev = current;
+            lastBrick = current;
         }
     }
 }
