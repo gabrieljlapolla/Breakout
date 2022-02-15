@@ -12,8 +12,8 @@ public class Ball extends JComponent {
 
     private double xVelocity;
     private double yVelocity;
-    private final double MIN_VELOCITY = 0.2;
-    private final double MAX_VELOCITY = 2;
+    private final double MIN_VELOCITY = 2;
+    private final double MAX_VELOCITY = 15;
     private double xCoord;
     private double yCoord;
 
@@ -115,6 +115,7 @@ public class Ball extends JComponent {
         xCoord += xVelocity;
         yCoord += yVelocity;
         setBounds((int) xCoord, (int) yCoord, getSize().width, getSize().width);
+        paintImmediately(getBounds());
     }
 
     protected void paintComponent(Graphics g) {

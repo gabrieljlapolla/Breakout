@@ -1,19 +1,20 @@
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
-import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.util.Timer;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
-
+ // https://coolors.co/e2fcef-9b287b-5c164e-402039-170f11
 /**
  *
  * @author Gabriel Lapolla
@@ -85,7 +86,7 @@ public class BreakoutGUI extends JFrame {
     public void createEvents(Timer timer) {
         // Close program when clicking button
         topButton.addActionListener((ActionEvent e) -> {
-            timer.cancel();
+            timer.stop();
             dispose();
         });
 
@@ -97,6 +98,15 @@ public class BreakoutGUI extends JFrame {
 
             public void mouseExited(MouseEvent e) {
                 topButton.setBackground(new Color(64, 32, 57));
+            }
+        });
+
+        // Add listener to stop timer when window is closed
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                timer.stop();
+                dispose();
             }
         });
     }
